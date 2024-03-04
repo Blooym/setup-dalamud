@@ -34,11 +34,13 @@ distribution-source:
 
 Add the following to your .csproj or .targets file, replacing any existing definitions of DalamudLibPath property.
 
+```xml
 <PropertyGroup>
   <DalamudLibPath Condition="$([MSBuild]::IsOSPlatform('Windows'))">$(appdata)\XIVLauncher\addon\Hooks\dev\</DalamudLibPath>
   <DalamudLibPath Condition="$([MSBuild]::IsOSPlatform('Linux'))">$(HOME)/.xlcore/dalamud/Hooks/dev/</DalamudLibPath>
   <DalamudLibPath Condition="$([MSBuild]::IsOSPlatform('OSX'))">$(HOME)/Library/Application Support/XIV on Mac/dalamud/Hooks/dev/</DalamudLibPath>
   <DalamudLibPath Condition="$(DALAMUD_HOME) != ''">$(DALAMUD_HOME)/</DalamudLibPath>
 </PropertyGroup>
+```
 
 You will now be able to use the DALAMUD_HOME environment variable to override the default DalamudLibPath when it's set.
