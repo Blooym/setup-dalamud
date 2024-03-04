@@ -1,0 +1,57 @@
+name: "Setup Dalamud"
+author: "Blooym"
+description: "Automatically setup a specific branch of Dalamud"
+branding:
+  color: red
+  icon: moon
+inputs:
+  branch:
+    description: "The branch name that should be installed. Use 'latest' for the stable branch."
+    required: true
+  path-environment-variable:
+    description: "The environment variable that final Dalamud installation path will be set under."
+    required: true
+    default: "DALAMUD_HOME"
+  distribution-source:
+    description: "[Experimental] The source location for downloading Dalamud releases."
+    required: true
+    default: "https://goatcorp.github.io/dalamud-distrib"
+runs:
+  using: "composite"
+  steps:
+    # Installer for Unix-like systems.
+    - name: Install Dalamud (UNIX-like)
+      if: runner.os != 'Windows'
+      shell: bash
+      env:
+        INSTALL_PATH: ${{ runner.temp }}/dalamud
+        ZIP_PATH: ${{ runner.temp }}/dalamud.zip
+        LATEST_DOWNLOAD: "${{ inputs.distribution-source }}/latest.zip"
+        BRANCH_DOWNLOAD: "${{ inputs.distribution-source }}/${{ inputs.branch }}/latest.zip"
+      run: |
+        if [ ${{ inputs.branch }} == 'release' ]; then
+          curl $LATEST_DOWNLOAD -o $ZIP_PATH
+        else
+          curl $BRANCH_DOWNLOAD -o $ZIP_PATH
+        fi
+        unzip $ZIP_PATH -d $INSTALL_PATH && rm $ZIP_PATH
+        echo "${{ inputs.path-environment-variable }}=$INSTALL_PATH" >> $GITHUB_ENV
+
+    # Installer for Windows systems.
+    - name: Install Dalamud (Windows)
+      if: runner.os == 'Windows'
+      shell: pwsh
+      env:
+        INSTALL_PATH: ${{ runner.temp }}\dalamud
+        ZIP_PATH: ${{ runner.temp }}\dalamud.zip
+        LATEST_DOWNLOAD: ${{ inputs.distribution-source }}/latest.zip
+        BRANCH_DOWNLOAD: ${{ inputs.distribution-source }}/${{ inputs.branch }}/latest.zip
+      run: |
+        if ( '${{ inputs.branch }}' -eq 'release') {
+          Invoke-WebRequest -Uri "$Env:LATEST_DOWNLOAD" -OutFile "$Env:ZIP_PATH"
+        } else {
+          Invoke-WebRequest -Uri "$Env:BRANCH_DOWNLOAD" -OutFile "$Env:ZIP_PATH"
+        }
+        Expand-Archive -LiteralPath "$Env:ZIP_PATH" -DestinationPath "$Env:INSTALL_PATH"
+        Remove-Item "$Env:ZIP_PATH"
+        "${{ inputs.path-environment-variable }}=$Env:INSTALL_PATH" >> $env:GITHUB_ENV
