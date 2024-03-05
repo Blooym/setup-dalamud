@@ -18,7 +18,7 @@ From [action.yml](./action.yml)
 
 ```yaml
 branch:
-  description: "The branch name that should be installed. Use 'latest' for the stable branch."
+  description: "The branch name that should be installed. Use 'release' for the stable branch."
   required: true
 path-environment-variable:
   description: "The environment variable that final Dalamud installation path will be set under."
