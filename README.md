@@ -32,6 +32,8 @@ distribution-source:
 
 ## Usage in MSBuild
 
+If you're using `Dalamud.Net.SDK` you already have everything you need. If you're not, either switch to it or do the following:
+
 Add the following to your .csproj or .targets file, replacing any existing definitions of DalamudLibPath property.
 
 ```xml
